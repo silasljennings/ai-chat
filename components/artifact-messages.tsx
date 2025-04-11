@@ -13,6 +13,7 @@ interface ArtifactMessagesProps {
   votes: Array<Vote> | undefined;
   messages: Array<UIMessage>;
   setMessages: UseChatHelpers['setMessages'];
+  append: UseChatHelpers['append'];
   reload: UseChatHelpers['reload'];
   isReadonly: boolean;
   artifactStatus: UIArtifact['status'];
@@ -24,6 +25,7 @@ function PureArtifactMessages({
   votes,
   messages,
   setMessages,
+  append,
   reload,
   isReadonly,
 }: ArtifactMessagesProps) {
@@ -47,6 +49,7 @@ function PureArtifactMessages({
               : undefined
           }
           setMessages={setMessages}
+          append={append}
           reload={reload}
           isReadonly={isReadonly}
         />
