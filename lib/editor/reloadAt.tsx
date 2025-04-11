@@ -44,8 +44,7 @@ export async function reloadAt(
 
     // Step 2: regenerate assistant message via append
     await reload()
+    console.log(`After ${after}`)
+    console.log(`Current ${after}`)
     setMessages((current) => [...current, ...after]);
-
-    // Step 3: restore remaining messages to the UI (excluding regenerated assistant message)
-    setMessages((currentMessages) => [...currentMessages, ...after]);
 }
