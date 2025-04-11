@@ -83,7 +83,7 @@ const PurePreviewMessage = ({
             },
           )}
         >
-          {message.role === 'assistant' && !isSubmitting && (
+          {message.role === 'assistant' && (
               <div className="flex flex-col pt-4 gap-4">
                   <button onClick={ () => handleClick(message) }
                       className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background hover:invert">
