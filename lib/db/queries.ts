@@ -160,19 +160,29 @@ export async function getChatById({ id }: { id: string }) {
   }
 }
 
-export async function saveMessages({
-  messages,
-}: {
-  messages: Array<DBMessage>;
-}) {
+export async function saveMessages({ messages }: { messages: Array<DBMessage>; }) {
   try {
-    console.log(`Saving Messages ${JSON.stringify(messages)}`);
-    return await db.insert(message).values(messages);
+    for (const messageRecord of messages) {
+      if (messageRecord.id) {
+        const existing = await getMessageById({ id: messageRecord.id });
+        if (existing) {
+          console.log(`message exists: ${existing}`);
+          await db.update(message).set(messageRecord).where(eq(message.id, messageRecord.id));
+        } else {
+          console.log(`new message: ${messageRecord}`);
+          await db.insert(message).values(messageRecord);
+        }
+      } else {
+        throw new Error(`Record does not have id: ${messageRecord}`);
+      }
+    }
+    return messages;
   } catch (error) {
-    console.error('Failed to save messages in database', error);
+    console.error("Failed to save messages in database", error);
     throw error;
   }
 }
+
 
 export async function getMessagesByChatId({ id }: { id: string }) {
   try {
