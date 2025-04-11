@@ -32,6 +32,6 @@ export async function reloadAt(
     console.log("messages[messageIndex]", messages[messageIndex]);
     setMessages(before);
     await append(userMessage);
-    console.log("rest", all.slice(messageIndex + 1);
+    console.log("rest", all.slice(messageIndex + 1));
     setMessages((current) => [...current, ...all.slice(messageIndex + 1)]);
 }
