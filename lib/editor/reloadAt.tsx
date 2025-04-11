@@ -24,7 +24,7 @@ export async function reloadAt(
 
     const before = messages.slice(0, messageIndex);
     const target = messages[messageIndex];
-    const after = messages.slice(messageIndex + 1);
+    const after = messages.slice(messageIndex);
 
     if (target.role !== "assistant") {
         throw new Error("Can only regenerate assistant messages.");
@@ -39,7 +39,7 @@ export async function reloadAt(
     const messagesToKeep = before.slice(0, lastUserIndex + 1);
 
     // Step 1: temporarily set UI to only show messages up to user prompt
-    setMessages(messagesToKeep);
+    // setMessages(messagesToKeep);
 
     // Step 2: regenerate assistant message via append
     await append(
