@@ -18,7 +18,7 @@ export async function reloadAt(
     messageId: string,
     chatRequestOptions?: ChatRequestOptions
 ) {
-    const messageIndex = messages.findIndex((m) => m.id === messageId);
+    const messageIndex = messages.findIndex((m) => m.id === messageId) + 1;
     if (messageIndex === -1) { throw new Error(`Message with id "${messageId}" not found.`); }
 
     const before = messages.slice(0, messageIndex) as Message[];
