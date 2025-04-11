@@ -34,6 +34,7 @@ export async function reloadAt(
         msg.id === updatedMessage.id ? updatedMessage : msg
     );
     console.log(JSON.stringify(updatedMessage));
+    console.log(JSON.stringify(updatedAll));
     // const dbMessage = {
     //     id: updatedMessage.id,
     //     chatId: chatId,
@@ -43,7 +44,7 @@ export async function reloadAt(
     //     attachments: updatedMessage.experimental_attachments ?? [],
     // };
     // await saveMessages({messages: [dbMessage],});
-    setMessages(updatedAll);
+    setMessages(updatedAll as Message[]);
 
     // const all = structuredClone(messages) as Message[];
     // console.log(`all ${JSON.stringify(all)}}`)
