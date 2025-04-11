@@ -13,6 +13,7 @@ interface MessagesProps {
   votes: Array<Vote> | undefined;
   messages: Array<UIMessage>;
   setMessages: UseChatHelpers['setMessages'];
+  append: UseChatHelpers['append'];
   reload: UseChatHelpers['reload'];
   isReadonly: boolean;
   isArtifactVisible: boolean;
@@ -24,6 +25,7 @@ function PureMessages({
   votes,
   messages,
   setMessages,
+  append,
   reload,
   isReadonly,
 }: MessagesProps) {
@@ -49,6 +51,7 @@ function PureMessages({
               : undefined
           }
           setMessages={setMessages}
+          append={append}
           reload={reload}
           isReadonly={isReadonly}
         />
