@@ -19,33 +19,23 @@ export async function reloadAt(
     chatRequestOptions?: ChatRequestOptions
 ) {
     const messageIndex = messages.findIndex((m) => m.id === messageId);
-    if (messageIndex === -1) {
-        throw new Error(`Message with id "${messageId}" not found.`);
-    }
+    if (messageIndex === -1) { throw new Error(`Message with id "${messageId}" not found.`); }
 
     const before = messages.slice(0, messageIndex) as Message[];
     const target = messages[messageIndex] as Message;
-    const after = messages.slice(messageIndex) as Message[];
+    const after = messages.slice(messageIndex + 1) as Message[];
     console.log(`before ${JSON.stringify(before)}}`)
     console.log(`target ${JSON.stringify(target)}`)
     console.log(`After ${JSON.stringify(after)}}`)
-    if (target.role !== "assistant") {
-        throw new Error("Can only regenerate assistant messages.");
-    }
+    if (target.role !== "assistant") { throw new Error("Can only regenerate assistant messages."); }
 
     const lastUserMessage = [...before].reverse().find((m) => m.role === "user");
-    if (!lastUserMessage) {
-        throw new Error("No preceding user message found.");
-    }
+    if (!lastUserMessage) { throw new Error("No preceding user message found."); }
 
     const lastUserIndex = before.findIndex((m) => m.id === lastUserMessage.id);
     const messagesToKeep = before.slice(0, lastUserIndex + 1);
 
-    // Step 1: temporarily set UI to only show messages up to user prompt
     setMessages(messagesToKeep);
-
-    // Step 2: regenerate assistant message via append
     await reload()
     setMessages((current) => [...current, ...after]);
-
 }
