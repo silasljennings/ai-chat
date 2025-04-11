@@ -49,20 +49,20 @@ const PurePreviewMessage = ({
         //     id: message.id,
         // });
         // await deleteMessage({ id: message.id });
-        setMessages((messages) => {
-            const index = messages.findIndex((m) => m.id === message.id);
-            if (index !== -1) {
-                const updatedMessage: Message = {
-                    ...message,
-                    content: draftContent,
-                    parts: [{ type: 'text', text: draftContent }],
-                };
-                return [...messages.slice(0, index), updatedMessage, ...messages.slice(index + 1)];
-            }
-            return messages;
-        });
+        // setMessages((messages) => {
+        //     const index = messages.findIndex((m) => m.id === message.id);
+        //     if (index !== -1) {
+        //         const updatedMessage: Message = {
+        //             ...message,
+        //             content: draftContent,
+        //             parts: [{ type: 'text', text: draftContent }],
+        //         };
+        //         return [...messages.slice(0, index), updatedMessage, ...messages.slice(index + 1)];
+        //     }
+        //     return messages;
+        // });
         setMode('view');
-        append(message);
+        reload();
     };
 
   return (

@@ -1,0 +1,4 @@
+get api to regenerate message on ai click
+integrate the specified models on the click
+replace the message content when generated
+

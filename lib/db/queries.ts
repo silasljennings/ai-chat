@@ -166,6 +166,7 @@ export async function saveMessages({
   messages: Array<DBMessage>;
 }) {
   try {
+    console.log(`Saving Messages ${JSON.stringify(messages)}`);
     return await db.insert(message).values(messages);
   } catch (error) {
     console.error('Failed to save messages in database', error);
