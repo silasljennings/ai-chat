@@ -21,12 +21,12 @@ export async function reloadAt(
     const messageIndex = messages.findIndex((m) => m.id === messageId);
     if (messageIndex === -1) { throw new Error(`Message with id "${messageId}" not found.`); }
 
+    const all = structuredClone(messages);
     const before = messages.slice(0, messageIndex) as Message[];
     // const target = messages[messageIndex] as Message;
-    const after = messages.slice(messageIndex + 1) as Message[];
+
     console.log(`before ${JSON.stringify(before)}}`)
     // console.log(`target ${JSON.stringify(target)}`)
-    console.log(`After ${JSON.stringify(after)}}`)
     console.log("messageIndex", messageIndex);
     console.log("messages.length", messages.length);
     console.log("messages[messageIndex]", messages[messageIndex]);
@@ -40,6 +40,5 @@ export async function reloadAt(
 
     setMessages(before);
     await reload()
-
-    setMessages((current) => [...current, ...after]);
+    setMessages((current) => [...current, ...all.slice(messageIndex + 1)]);
 }
