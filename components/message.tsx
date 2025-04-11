@@ -19,7 +19,7 @@ import { MessageEditor } from './message-editor';
 import { DocumentPreview } from './document-preview';
 import { MessageReasoning } from './message-reasoning';
 import { UseChatHelpers } from '@ai-sdk/react';
-import {deleteMessage, deleteTrailingMessages} from "@/app/(chat)/actions";
+// import {deleteMessage, deleteTrailingMessages} from "@/app/(chat)/actions";
 
 const PurePreviewMessage = ({
   chatId,
@@ -28,6 +28,7 @@ const PurePreviewMessage = ({
   isLoading,
   setMessages,
   append,
+  reload,
   isReadonly,
 }: {
   chatId: string;
@@ -36,6 +37,7 @@ const PurePreviewMessage = ({
   isLoading: boolean;
   setMessages: UseChatHelpers['setMessages'];
   append: UseChatHelpers['append'];
+  reload: UseChatHelpers['reload'];
   isReadonly: boolean;
 }) => {
   const [mode, setMode] = useState<'view' | 'edit'>('view');
