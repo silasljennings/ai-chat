@@ -226,7 +226,7 @@ export const LogoGoogle = ({ size = 16 }: { size?: number }) => {
   );
 };
 
-export const LogoAnthropic = () => {
+export const LogoAnthropic = ({ size = 16 }: { size?: number }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -235,8 +235,8 @@ export const LogoAnthropic = () => {
       y="0px"
       viewBox="0 0 92.2 65"
       style={{ color: 'currentcolor', fill: 'currentcolor' }}
-      width="18px"
-      height="18px"
+      width={size}
+      height={size}
     >
       <path
         d="M66.5,0H52.4l25.7,65h14.1L66.5,0z M25.7,0L0,65h14.4l5.3-13.6h26.9L51.8,65h14.4L40.5,0C40.5,0,25.7,0,25.7,0z

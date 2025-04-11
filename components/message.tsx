@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { memo, useState } from 'react';
 import type { Vote } from '@/lib/db/schema';
 import { DocumentToolCall, DocumentToolResult } from './document';
-import { PencilEditIcon, SparklesIcon } from './icons';
+import {LogoAnthropic, LogoOpenAI, PencilEditIcon, SparklesIcon} from './icons';
 import { Markdown } from './markdown';
 import { MessageActions } from './message-actions';
 import { PreviewAttachment } from './preview-attachment';
@@ -58,15 +58,22 @@ const PurePreviewMessage = ({
           )}
         >
           {message.role === 'assistant' && (
-            <div className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background">
-              <div className="translate-y-px">
-                <SparklesIcon size={14} />
+              <div
+                  className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background">
+                  <div className="translate-y-px">
+                      <SparklesIcon size={14}/>
+                  </div>
+                  <div className="translate-y-px">
+                      <LogoOpenAI size={14}/>
+                  </div>
+                  <div className="translate-y-px">
+                      <LogoAnthropic size={14}/>
+                  </div>
               </div>
-            </div>
           )}
 
-          <div className="flex flex-col gap-4 w-full">
-            {message.experimental_attachments && (
+            <div className="flex flex-col gap-4 w-full">
+                {message.experimental_attachments && (
               <div
                 data-testid={`message-attachments`}
                 className="flex flex-row justify-end gap-2"
