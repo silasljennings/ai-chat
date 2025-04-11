@@ -35,6 +35,20 @@ export async function generateTitleFromUserMessage({
   return title;
 }
 
+export async function reGenerateTextFromUserMessage({message}: { message: Message; }) {
+  const { text: regeneratedResponse } = await generateText({
+    model: myProvider.languageModel('chat-model'),
+    system: `\n
+    - you will generate a response for the prompt
+    - in your case, your execution occurs when a user is needing to re generate a new response
+    - it does not need to match the last response: ${message.content}
+   `,
+    prompt: JSON.stringify(message),
+  });
+
+  return regeneratedResponse;
+}
+
 export async function deleteTrailingMessages({ id }: { id: string }) {
   const [message] = await getMessageById({ id });
 
