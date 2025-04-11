@@ -8,12 +8,13 @@
  * @param chatRequestOptions
  */
 import { UseChatHelpers } from "@ai-sdk/react";
-import { ChatRequestOptions, Message } from "ai";
+import {ChatRequestOptions, Message, UIMessage} from "ai";
+import {getMessageById} from "@/lib/db/queries";
 
 export async function reloadAt(
     setMessages: UseChatHelpers["setMessages"],
     messages: UseChatHelpers["messages"],
-    append: UseChatHelpers["append"],
+    reload: UseChatHelpers["reload"],
     messageId: string,
     chatRequestOptions?: ChatRequestOptions
 ) {
@@ -39,13 +40,11 @@ export async function reloadAt(
     const messagesToKeep = before.slice(0, lastUserIndex + 1);
 
     // Step 1: temporarily set UI to only show messages up to user prompt
-    // setMessages(messagesToKeep);
+    setMessages(messagesToKeep);
 
     // Step 2: regenerate assistant message via append
-    await append(
-        { role: "user", content: lastUserMessage.content, id: lastUserMessage.id },
-        chatRequestOptions
-    );
+    await reload()
+    setMessages((current) => [...current, ...after]);
 
     // Step 3: restore remaining messages to the UI (excluding regenerated assistant message)
     setMessages((currentMessages) => [...currentMessages, ...after]);
