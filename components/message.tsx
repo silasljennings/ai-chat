@@ -27,7 +27,7 @@ const PurePreviewMessage = ({
   vote,
   isLoading,
   setMessages,
-  reload,
+  append,
   isReadonly,
 }: {
   chatId: string;
@@ -35,7 +35,7 @@ const PurePreviewMessage = ({
   vote: Vote | undefined;
   isLoading: boolean;
   setMessages: UseChatHelpers['setMessages'];
-  reload: UseChatHelpers['reload'];
+  append: UseChatHelpers['append'];
   isReadonly: boolean;
 }) => {
   const [mode, setMode] = useState<'view' | 'edit'>('view');
@@ -43,9 +43,9 @@ const PurePreviewMessage = ({
     const [draftContent, setDraftContent] = useState<string>(message.content);
     const handleClick = async (message: Message) => {
         setIsSubmitting(true);
-        await deleteTrailingMessages({
-            id: message.id,
-        });
+        // await deleteTrailingMessages({
+        //     id: message.id,
+        // });
         // await deleteMessage({ id: message.id });
         setMessages((messages) => {
             const index = messages.findIndex((m) => m.id === message.id);
@@ -60,7 +60,7 @@ const PurePreviewMessage = ({
             return messages;
         });
         setMode('view');
-        reload();
+        append(message);
     };
 
   return (
