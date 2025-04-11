@@ -51,7 +51,7 @@ const PurePreviewMessage = ({
         if (id) {
             setIsSubmitting(true);
             setMode('view')
-            await reloadAt(setMessages, messages, reload, append, id);
+            await reloadAt(setMessages, messages, reload, append, id, chatId);
             setIsSubmitting(false);
             // let message: Message;
             // const messagesFiltered = messages.filter(m => m.id === id);

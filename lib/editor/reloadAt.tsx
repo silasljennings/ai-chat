@@ -9,8 +9,8 @@
  */
 import {UseAssistantHelpers, UseChatHelpers} from "@ai-sdk/react";
 import {ChatRequestOptions, Message, UIMessage} from "ai";
-import {getMessageById, saveMessages} from "@/lib/db/queries";
 import {reGenerateTextFromUserMessage} from "@/app/(chat)/actions";
+import {saveMessages} from "@/lib/db/queries";
 
 export async function reloadAt(
     setMessages: UseChatHelpers["setMessages"],
@@ -18,6 +18,7 @@ export async function reloadAt(
     reload: UseChatHelpers["reload"],
     append: UseChatHelpers["append"],
     messageId: string,
+    chatId: string,
     chatRequestOptions?: ChatRequestOptions
 ) {
     const messageIndex = messages.findIndex((m) => m.id === messageId);
@@ -26,11 +27,23 @@ export async function reloadAt(
     console.log("messages.length", messages.length);
     console.log("messages[messageIndex]", messages[messageIndex]);
     const newResponse = await reGenerateTextFromUserMessage({ message: messages[messageIndex] as Message })
-    console.log(JSON.stringify(messages[messageIndex]))
-    messages[messageIndex].content = newResponse;
-    console.log(newResponse);
-    console.log(JSON.stringify(messages[messageIndex]))
-    setMessages(messages);
+    const all = structuredClone(messages);
+    const updatedMessage = structuredClone(messages[messageIndex]);
+    updatedMessage.content = newResponse;
+    const updatedAll = all.map((msg) =>
+        msg.id === updatedMessage.id ? updatedMessage : msg
+    );
+    console.log(JSON.stringify(updatedMessage));
+    // const dbMessage = {
+    //     id: updatedMessage.id,
+    //     chatId: chatId,
+    //     role: updatedMessage.role,
+    //     createdAt:updatedMessage.createdAt,
+    //     parts: updatedMessage.parts,
+    //     attachments: updatedMessage.experimental_attachments ?? [],
+    // };
+    // await saveMessages({messages: [dbMessage],});
+    setMessages(updatedAll);
 
     // const all = structuredClone(messages) as Message[];
     // console.log(`all ${JSON.stringify(all)}}`)
