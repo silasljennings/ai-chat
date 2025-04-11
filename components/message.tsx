@@ -19,15 +19,13 @@ import { MessageEditor } from './message-editor';
 import { DocumentPreview } from './document-preview';
 import { MessageReasoning } from './message-reasoning';
 import { UseChatHelpers } from '@ai-sdk/react';
-import {deleteMessage, deleteTrailingMessages} from "@/app/(chat)/actions";
-import {getMessagesByChatId} from "@/lib/db/queries";
+import {deleteMessage} from "@/app/(chat)/actions";
 
 const PurePreviewMessage = ({
   chatId,
   message,
   vote,
   isLoading,
-  messages,
   setMessages,
   reload,
   isReadonly,
@@ -36,7 +34,6 @@ const PurePreviewMessage = ({
   message: UIMessage;
   vote: Vote | undefined;
   isLoading: boolean;
-  messages: UseChatHelpers['messages'];
   setMessages: UseChatHelpers['setMessages'];
   reload: UseChatHelpers['reload'];
   isReadonly: boolean;
@@ -47,17 +44,18 @@ const PurePreviewMessage = ({
     const handleClick = async (message: Message) => {
         setIsSubmitting(true);
         await deleteMessage({ id: message.id });
-        // TODO: set model
-
-        const index = messages.findIndex((m) => m.id === message.id);
-        if (index !== -1) {
-            const updatedMessage = {
-                ...message,
-                content: draftContent,
-                parts: [{ type: 'text', text: draftContent }],
-            };
-            return [...messages.slice(0, index), updatedMessage];
-        }
+        setMessages((messages) => {
+            const index = messages.findIndex((m) => m.id === message.id);
+            if (index !== -1) {
+                const updatedMessage: Message = {
+                    ...message,
+                    content: draftContent,
+                    parts: [{ type: 'text', text: draftContent }],
+                };
+                return [...messages.slice(0, index), updatedMessage, ...messages.slice(index + 1)];
+            }
+            return messages;
+        });
         setMode('view');
         reload();
     };
