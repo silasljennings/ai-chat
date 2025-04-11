@@ -36,15 +36,15 @@ export async function reloadAt(
     );
     console.log(JSON.stringify(updatedMessage));
     console.log(JSON.stringify(updatedAll));
-    // const dbMessage = {
-    //     id: updatedMessage.id,
-    //     chatId: chatId,
-    //     role: updatedMessage.role,
-    //     createdAt:updatedMessage.createdAt,
-    //     parts: updatedMessage.parts,
-    //     attachments: updatedMessage.experimental_attachments ?? [],
-    // };
-    // await saveMessages({messages: [dbMessage],});
+    const dbMessage = {
+        id: updatedMessage.id,
+        chatId: chatId,
+        role: updatedMessage.role,
+        createdAt: new Date(),
+        parts: updatedMessage.parts,
+        attachments: updatedMessage.experimental_attachments ?? [],
+    };
+    await saveMessages({messages: [dbMessage]});
     setMessages(updatedAll as Message[]);
 
     // const all = structuredClone(messages) as Message[];
