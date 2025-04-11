@@ -22,6 +22,7 @@ export async function reloadAt(
     if (messageIndex === -1) { throw new Error(`Message with id "${messageId}" not found.`); }
 
     const all = structuredClone(messages);
+    console.log(`all ${JSON.stringify(all)}}`)
     const before = messages.slice(0, messageIndex) as Message[];
     // const target = messages[messageIndex] as Message;
 
