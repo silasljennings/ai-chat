@@ -19,6 +19,7 @@ import { MessageEditor } from './message-editor';
 import { DocumentPreview } from './document-preview';
 import { MessageReasoning } from './message-reasoning';
 import { UseChatHelpers } from '@ai-sdk/react';
+import {reloadAt} from "@/lib/editor/reloadAt";
 // import {deleteMessage, deleteTrailingMessages} from "@/app/(chat)/actions";
 
 const PurePreviewMessage = ({
@@ -48,33 +49,32 @@ const PurePreviewMessage = ({
     const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
         const id = e.currentTarget.id;
         if (id) {
-            let message: Message;
-            const messagesFiltered = messages.filter(m => m.id === id);
-            if (messagesFiltered && messagesFiltered.length > 0) {
-                message = messagesFiltered[0];
-                setMessages((messages) => {
-                    const index = messages.findIndex((m) => m.id === message.id);
-                    if (index !== -1) {
-                        const updatedMessage: Message = {
-                            ...message,
-                            content: draftContent,
-                            parts: [{ type: 'text', text: draftContent }],
-                        };
-                        return [...messages.slice(0, index), updatedMessage, ...messages.slice(index + 1)];
-                    }
-                    return messages;
-                });
-            }
-
-            setMode('view');
-            reload();
+            setIsSubmitting(true);
+            setMode('view')
+            await reloadAt(setMessages, messages, append, id);
+            setIsSubmitting(false);
+            // let message: Message;
+            // const messagesFiltered = messages.filter(m => m.id === id);
+            // if (messagesFiltered && messagesFiltered.length > 0) {
+            //     message = messagesFiltered[0];
+            //     console.log(`message ${JSON.stringify(message)}`);
+            //     setMessages((messages) => {
+            //         const index = messages.findIndex((m) => m.id === message.id);
+            //         if (index !== -1) {
+            //             const updatedMessage: Message = {
+            //                 ...message,
+            //                 content: draftContent,
+            //                 parts: [{ type: 'text', text: draftContent }],
+            //             };
+            //             return [...messages.slice(0, index), updatedMessage, ...messages.slice(index + 1)];
+            //         }
+            //         return messages;
+            //     });
+            // }
+            //
+            // setMode('view');
+            // reload();
         }
-        setIsSubmitting(true);
-        // await deleteTrailingMessages({
-        //     id: message.id,
-        // });
-        // await deleteMessage({ id: message.id });
-
     };
 
   return (
