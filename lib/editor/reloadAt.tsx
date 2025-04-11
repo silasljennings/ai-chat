@@ -23,9 +23,9 @@ export async function reloadAt(
         throw new Error(`Message with id "${messageId}" not found.`);
     }
 
-    const before = messages.slice(0, messageIndex);
-    const target = messages[messageIndex];
-    const after = messages.slice(messageIndex);
+    const before = messages.slice(0, messageIndex) as Message[];
+    const target = messages[messageIndex] as Message;
+    const after = messages.slice(messageIndex) as Message[];
 
     if (target.role !== "assistant") {
         throw new Error("Can only regenerate assistant messages.");
@@ -44,7 +44,8 @@ export async function reloadAt(
 
     // Step 2: regenerate assistant message via append
     await reload()
-    console.log(`After ${after}`)
-    console.log(`Current ${after}`)
+    console.log(`After ${JSON.stringify(after)}}`)
+    console.log(`Current ${JSON.stringify(after)}`)
     setMessages((current) => [...current, ...after]);
+
 }
