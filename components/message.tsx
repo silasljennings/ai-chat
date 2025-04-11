@@ -58,25 +58,25 @@ const PurePreviewMessage = ({
           )}
         >
           {message.role === 'assistant' && (
-              <div className="flex gap-4 w-full group-data-[role=user]/message:w-fit">
-                  <div
+              <div className="flex flex-col pt-4 gap-4">
+                  <button
                       className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background">
                       <div className="translate-y-px">
                           <SparklesIcon size={14}/>
                       </div>
-                  </div>
-                  <div
+                  </button>
+                  <button
                       className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background">
                       <div className="translate-y-px">
                           <LogoAnthropic size={14}/>
                       </div>
-                  </div>
-                  <div
+                  </button>
+                  <button
                       className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background">
                       <div className="translate-y-px">
                           <LogoOpenAI size={14}/>
                       </div>
-                  </div>
+                  </button>
               </div>
           )}
 
@@ -86,18 +86,18 @@ const PurePreviewMessage = ({
                         data-testid={`message-attachments`}
                         className="flex flex-row justify-end gap-2"
                     >
-                    {message.experimental_attachments.map((attachment) => (
-                  <PreviewAttachment
-                    key={attachment.url}
-                    attachment={attachment}
-                  />
-                ))}
-              </div>
-            )}
+                        {message.experimental_attachments.map((attachment) => (
+                            <PreviewAttachment
+                                key={attachment.url}
+                                attachment={attachment}
+                            />
+                        ))}
+                    </div>
+                )}
 
-            {message.parts?.map((part, index) => {
-              const { type } = part;
-              const key = `message-${message.id}-part-${index}`;
+                {message.parts?.map((part, index) => {
+                    const {type} = part;
+                    const key = `message-${message.id}-part-${index}`;
 
               if (type === 'reasoning') {
                 return (
