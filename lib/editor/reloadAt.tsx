@@ -30,6 +30,7 @@ export async function reloadAt(
     const all = structuredClone(messages);
     const updatedMessage = structuredClone(messages[messageIndex]);
     updatedMessage.content = newResponse;
+    updatedMessage.parts = [{type: 'text', text: newResponse}];
     const updatedAll = all.map((msg) =>
         msg.id === updatedMessage.id ? updatedMessage : msg
     );
