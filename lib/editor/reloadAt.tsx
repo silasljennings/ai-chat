@@ -26,13 +26,16 @@ export async function reloadAt(
     console.log("messages.length", messages.length);
     console.log("messages[messageIndex]", messages[messageIndex]);
     const newResponse = await reGenerateTextFromUserMessage({ message: messages[messageIndex] as Message })
+    console.log(JSON.stringify(messages[messageIndex]))
     messages[messageIndex].content = newResponse;
+    console.log(newResponse);
+    console.log(JSON.stringify(messages[messageIndex]))
     setMessages(messages);
 
-    const all = structuredClone(messages) as Message[];
-    console.log(`all ${JSON.stringify(all)}}`)
-    const before = messages.slice(0, messageIndex) as Message[];
-    console.log(`before ${JSON.stringify(before)}}`)
+    // const all = structuredClone(messages) as Message[];
+    // console.log(`all ${JSON.stringify(all)}}`)
+    // const before = messages.slice(0, messageIndex) as Message[];
+    // console.log(`before ${JSON.stringify(before)}}`)
 
     // setMessages(before);
     // await reload();
