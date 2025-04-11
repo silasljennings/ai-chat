@@ -18,7 +18,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 import { MessageEditor } from './message-editor';
 import { DocumentPreview } from './document-preview';
 import { MessageReasoning } from './message-reasoning';
-import { UseChatHelpers } from '@ai-sdk/react';
+import {UseAssistantHelpers, UseChatHelpers} from '@ai-sdk/react';
 import {reloadAt} from "@/lib/editor/reloadAt";
 // import {deleteMessage, deleteTrailingMessages} from "@/app/(chat)/actions";
 
@@ -51,7 +51,7 @@ const PurePreviewMessage = ({
         if (id) {
             setIsSubmitting(true);
             setMode('view')
-            await reloadAt(setMessages, messages, reload, id);
+            await reloadAt(setMessages, messages, reload, append, id);
             setIsSubmitting(false);
             // let message: Message;
             // const messagesFiltered = messages.filter(m => m.id === id);

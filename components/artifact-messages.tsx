@@ -5,7 +5,7 @@ import { UIMessage } from 'ai';
 import { memo } from 'react';
 import equal from 'fast-deep-equal';
 import { UIArtifact } from './artifact';
-import { UseChatHelpers } from '@ai-sdk/react';
+import { UseChatHelpers} from '@ai-sdk/react';
 
 interface ArtifactMessagesProps {
   chatId: string;
