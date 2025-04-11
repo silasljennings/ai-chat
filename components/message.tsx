@@ -19,7 +19,7 @@ import { MessageEditor } from './message-editor';
 import { DocumentPreview } from './document-preview';
 import { MessageReasoning } from './message-reasoning';
 import { UseChatHelpers } from '@ai-sdk/react';
-import {deleteMessage} from "@/app/(chat)/actions";
+import {deleteMessage, deleteTrailingMessages} from "@/app/(chat)/actions";
 
 const PurePreviewMessage = ({
   chatId,
@@ -43,6 +43,9 @@ const PurePreviewMessage = ({
     const [draftContent, setDraftContent] = useState<string>(message.content);
     const handleClick = async (message: Message) => {
         setIsSubmitting(true);
+        await deleteTrailingMessages({
+            id: message.id,
+        });
         // await deleteMessage({ id: message.id });
         setMessages((messages) => {
             const index = messages.findIndex((m) => m.id === message.id);
