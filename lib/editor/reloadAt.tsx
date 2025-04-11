@@ -23,7 +23,6 @@ export async function reloadAt(
     if (messageIndex === -1) { throw new Error(`Message with id "${messageId}" not found.`); }
 
     const all = structuredClone(messages);
-    const userMessage = messages[messageIndex-1]
     console.log(`all ${JSON.stringify(all)}}`)
     const before = messages.slice(0, messageIndex) as Message[];
     console.log(`before ${JSON.stringify(before)}}`)
@@ -31,7 +30,22 @@ export async function reloadAt(
     console.log("messages.length", messages.length);
     console.log("messages[messageIndex]", messages[messageIndex]);
     setMessages(before);
-    await append(userMessage);
-    console.log("rest", all.slice(messageIndex + 1));
-    setMessages((current) => [...current, ...all.slice(messageIndex + 1)]);
+    await reload();
+    setMessages((current) => {
+        const currentIds = new Set(current.map((msg) => msg.id));
+        const allMap = new Map(all.map((msg) => [msg.id, msg]));
+
+        // Override with current versions first
+        const merged = current.map((msg) => allMap.get(msg.id) || msg);
+
+        // Then append messages in "all" that are not in current
+        for (const msg of all) {
+            if (!currentIds.has(msg.id)) {
+                merged.push(msg);
+            }
+        }
+
+        return merged;
+    });
+
 }
