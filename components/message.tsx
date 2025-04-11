@@ -43,7 +43,7 @@ const PurePreviewMessage = ({
     const [draftContent, setDraftContent] = useState<string>(message.content);
     const handleClick = async (message: Message) => {
         setIsSubmitting(true);
-        await deleteMessage({ id: message.id });
+        // await deleteMessage({ id: message.id });
         setMessages((messages) => {
             const index = messages.findIndex((m) => m.id === message.id);
             if (index !== -1) {
