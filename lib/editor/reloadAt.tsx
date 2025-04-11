@@ -27,6 +27,9 @@ export async function reloadAt(
     console.log(`before ${JSON.stringify(before)}}`)
     console.log(`target ${JSON.stringify(target)}`)
     console.log(`After ${JSON.stringify(after)}}`)
+    console.log("messageIndex", messageIndex);
+    console.log("messages.length", messages.length);
+    console.log("messages[messageIndex]", messages[messageIndex]);
     if (target.role !== "assistant") { throw new Error("Can only regenerate assistant messages."); }
 
     const lastUserMessage = [...before].reverse().find((m) => m.role === "user");
