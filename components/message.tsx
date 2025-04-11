@@ -1,6 +1,6 @@
 'use client';
 
-import type { UIMessage } from 'ai';
+import type {Message, UIMessage} from 'ai';
 import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 import { memo, useState } from 'react';
@@ -19,12 +19,15 @@ import { MessageEditor } from './message-editor';
 import { DocumentPreview } from './document-preview';
 import { MessageReasoning } from './message-reasoning';
 import { UseChatHelpers } from '@ai-sdk/react';
+import {deleteMessage, deleteTrailingMessages} from "@/app/(chat)/actions";
+import {getMessagesByChatId} from "@/lib/db/queries";
 
 const PurePreviewMessage = ({
   chatId,
   message,
   vote,
   isLoading,
+  messages,
   setMessages,
   reload,
   isReadonly,
@@ -33,11 +36,31 @@ const PurePreviewMessage = ({
   message: UIMessage;
   vote: Vote | undefined;
   isLoading: boolean;
+  messages: UseChatHelpers['messages'];
   setMessages: UseChatHelpers['setMessages'];
   reload: UseChatHelpers['reload'];
   isReadonly: boolean;
 }) => {
   const [mode, setMode] = useState<'view' | 'edit'>('view');
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const [draftContent, setDraftContent] = useState<string>(message.content);
+    const handleClick = async (message: Message) => {
+        setIsSubmitting(true);
+        await deleteMessage({ id: message.id });
+        // TODO: set model
+
+        const index = messages.findIndex((m) => m.id === message.id);
+        if (index !== -1) {
+            const updatedMessage = {
+                ...message,
+                content: draftContent,
+                parts: [{ type: 'text', text: draftContent }],
+            };
+            return [...messages.slice(0, index), updatedMessage];
+        }
+        setMode('view');
+        reload();
+    };
 
   return (
     <AnimatePresence>
@@ -57,22 +80,22 @@ const PurePreviewMessage = ({
             },
           )}
         >
-          {message.role === 'assistant' && (
+          {message.role === 'assistant' && !isSubmitting && (
               <div className="flex flex-col pt-4 gap-4">
-                  <button
-                      className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background">
+                  <button onClick={ () => handleClick(message) }
+                      className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background hover:invert">
                       <div className="translate-y-px">
                           <SparklesIcon size={14}/>
                       </div>
                   </button>
-                  <button
-                      className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background">
+                  <button onClick={ () => handleClick(message) }
+                      className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background hover:invert">
                       <div className="translate-y-px">
                           <LogoAnthropic size={14}/>
                       </div>
                   </button>
-                  <button
-                      className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background">
+                  <button onClick={ () => handleClick(message) }
+                      className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background hover:invert">
                       <div className="translate-y-px">
                           <LogoOpenAI size={14}/>
                       </div>

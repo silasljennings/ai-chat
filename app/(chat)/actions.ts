@@ -4,6 +4,7 @@ import { generateText, Message } from 'ai';
 import { cookies } from 'next/headers';
 
 import {
+  deleteMessageById,
   deleteMessagesByChatIdAfterTimestamp,
   getMessageById,
   updateChatVisiblityById,
@@ -40,6 +41,14 @@ export async function deleteTrailingMessages({ id }: { id: string }) {
   await deleteMessagesByChatIdAfterTimestamp({
     chatId: message.chatId,
     timestamp: message.createdAt,
+  });
+}
+
+export async function deleteMessage({ id }: { id: string }) {
+  const [message] = await getMessageById({ id });
+
+  await deleteMessageById({
+    id: message.id
   });
 }
 
