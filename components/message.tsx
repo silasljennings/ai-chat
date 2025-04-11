@@ -3,7 +3,7 @@
 import type {Message, UIMessage} from 'ai';
 import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
-import { memo, useState } from 'react';
+import React, { memo, useState } from 'react';
 import type { Vote } from '@/lib/db/schema';
 import { DocumentToolCall, DocumentToolResult } from './document';
 import {LogoAnthropic, LogoOpenAI, PencilEditIcon, SparklesIcon} from './icons';
@@ -24,6 +24,7 @@ import { UseChatHelpers } from '@ai-sdk/react';
 const PurePreviewMessage = ({
   chatId,
   message,
+  messages,
   vote,
   isLoading,
   setMessages,
@@ -33,6 +34,7 @@ const PurePreviewMessage = ({
 }: {
   chatId: string;
   message: UIMessage;
+  messages: UseChatHelpers['messages'];
   vote: Vote | undefined;
   isLoading: boolean;
   setMessages: UseChatHelpers['setMessages'];
@@ -43,26 +45,36 @@ const PurePreviewMessage = ({
   const [mode, setMode] = useState<'view' | 'edit'>('view');
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [draftContent, setDraftContent] = useState<string>(message.content);
-    const handleClick = async (message: Message) => {
+    const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+        const id = e.currentTarget.id;
+        if (id) {
+            let message: Message;
+            const messagesFiltered = messages.filter(m => m.id === id);
+            if (messagesFiltered && messagesFiltered.length > 0) {
+                message = messagesFiltered[0];
+                setMessages((messages) => {
+                    const index = messages.findIndex((m) => m.id === message.id);
+                    if (index !== -1) {
+                        const updatedMessage: Message = {
+                            ...message,
+                            content: draftContent,
+                            parts: [{ type: 'text', text: draftContent }],
+                        };
+                        return [...messages.slice(0, index), updatedMessage, ...messages.slice(index + 1)];
+                    }
+                    return messages;
+                });
+            }
+
+            setMode('view');
+            reload();
+        }
         setIsSubmitting(true);
         // await deleteTrailingMessages({
         //     id: message.id,
         // });
         // await deleteMessage({ id: message.id });
-        setMessages((messages) => {
-            const index = messages.findIndex((m) => m.id === message.id);
-            if (index !== -1) {
-                const updatedMessage: Message = {
-                    ...message,
-                    content: draftContent,
-                    parts: [{ type: 'text', text: draftContent }],
-                };
-                return [...messages.slice(0, index), updatedMessage, ...messages.slice(index + 1)];
-            }
-            return messages;
-        });
-        setMode('view');
-        reload();
+
     };
 
   return (
@@ -85,19 +97,22 @@ const PurePreviewMessage = ({
         >
           {message.role === 'assistant' && (
               <div className="flex flex-col pt-4 gap-4">
-                  <button onClick={ () => handleClick(message) }
+                  <button onClick={ (e) => handleClick(e) }
+                          id={message.id}
                       className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background hover:invert">
                       <div className="translate-y-px">
                           <SparklesIcon size={14}/>
                       </div>
                   </button>
-                  <button onClick={ () => handleClick(message) }
+                  <button onClick={ (e) => handleClick(e) }
+                          id={message.id}
                       className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background hover:invert">
                       <div className="translate-y-px">
                           <LogoAnthropic size={14}/>
                       </div>
                   </button>
-                  <button onClick={ () => handleClick(message) }
+                  <button onClick={ (e) => handleClick(e) }
+                          id={message.id}
                       className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background hover:invert">
                       <div className="translate-y-px">
                           <LogoOpenAI size={14}/>

@@ -42,6 +42,7 @@ function PureArtifactMessages({
           chatId={chatId}
           key={message.id}
           message={message}
+          messages={messages}
           isLoading={status === 'streaming' && index === messages.length - 1}
           vote={
             votes
