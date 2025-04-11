@@ -160,7 +160,7 @@ export async function getChatById({ id }: { id: string }) {
   }
 }
 
-export async function saverMessages({ messages }: { messages: Array<DBMessage>; }) {
+export async function saveMessages({ messages }: { messages: Array<DBMessage>; }) {
   try {
     for (const messageRecord of messages) {
       if (messageRecord.id) {
