@@ -1,0 +1,1 @@
+ALTER TABLE "Message_v2" ALTER COLUMN "updatedAt" SET DEFAULT now();

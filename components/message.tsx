@@ -1,12 +1,12 @@
 'use client';
 
-import type {Message, UIMessage} from 'ai';
+import type {UIMessage} from 'ai';
 import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { memo, useState } from 'react';
+import React, {memo, useEffect, useState} from 'react';
 import type { Vote } from '@/lib/db/schema';
 import { DocumentToolCall, DocumentToolResult } from './document';
-import {LogoAnthropic, LogoOpenAI, PencilEditIcon, SparklesIcon} from './icons';
+import {PencilEditIcon, SparklesIcon} from './icons';
 import { Markdown } from './markdown';
 import { MessageActions } from './message-actions';
 import { PreviewAttachment } from './preview-attachment';
@@ -18,9 +18,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 import { MessageEditor } from './message-editor';
 import { DocumentPreview } from './document-preview';
 import { MessageReasoning } from './message-reasoning';
-import {UseAssistantHelpers, UseChatHelpers} from '@ai-sdk/react';
-import {reloadAt} from "@/lib/editor/reloadAt";
-// import {deleteMessage, deleteTrailingMessages} from "@/app/(chat)/actions";
+import {UseChatHelpers} from '@ai-sdk/react';
+import {getChatModelCookie, regenerateAssistantMessage} from "@/app/(chat)/actions";
 
 const PurePreviewMessage = ({
   chatId,
@@ -43,37 +42,23 @@ const PurePreviewMessage = ({
   reload: UseChatHelpers['reload'];
   isReadonly: boolean;
 }) => {
+
   const [mode, setMode] = useState<'view' | 'edit'>('view');
-    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-    const [draftContent, setDraftContent] = useState<string>(message.content);
-    const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
-        const id = e.currentTarget.id;
-        if (id) {
-            setIsSubmitting(true);
-            setMode('view')
-            await reloadAt(setMessages, messages, reload, append, id, chatId);
-            setIsSubmitting(false);
-            // let message: Message;
-            // const messagesFiltered = messages.filter(m => m.id === id);
-            // if (messagesFiltered && messagesFiltered.length > 0) {
-            //     message = messagesFiltered[0];
-            //     console.log(`message ${JSON.stringify(message)}`);
-            //     setMessages((messages) => {
-            //         const index = messages.findIndex((m) => m.id === message.id);
-            //         if (index !== -1) {
-            //             const updatedMessage: Message = {
-            //                 ...message,
-            //                 content: draftContent,
-            //                 parts: [{ type: 'text', text: draftContent }],
-            //             };
-            //             return [...messages.slice(0, index), updatedMessage, ...messages.slice(index + 1)];
-            //         }
-            //         return messages;
-            //     });
-            // }
-            //
-            // setMode('view');
-            // reload();
+
+    const handleRegenerate = async (assistantMessageId: string) => {
+        const model = await getChatModelCookie();
+        if (assistantMessageId) {
+            try {
+                const newMessage = await regenerateAssistantMessage({ chatId, assistantMessageId, model });
+                console.log(newMessage);
+                setMessages((prevMessages) => {
+                    return prevMessages.map((message) => message.id === assistantMessageId ? { ...message, ...newMessage } : message);
+                });
+            } catch (error) {
+                console.error('Error regenerating assistant message:', error);
+            } finally {
+                console.log('done')
+            }
         }
     };
 
@@ -95,32 +80,6 @@ const PurePreviewMessage = ({
             },
           )}
         >
-          {message.role === 'assistant' && (
-              <div className="flex flex-col pt-4 gap-4">
-                  <button onClick={ (e) => handleClick(e) }
-                          id={message.id}
-                      className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background hover:invert">
-                      <div className="translate-y-px">
-                          <SparklesIcon size={14}/>
-                      </div>
-                  </button>
-                  <button onClick={ (e) => handleClick(e) }
-                          id={message.id}
-                      className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background hover:invert">
-                      <div className="translate-y-px">
-                          <LogoAnthropic size={14}/>
-                      </div>
-                  </button>
-                  <button onClick={ (e) => handleClick(e) }
-                          id={message.id}
-                      className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background hover:invert">
-                      <div className="translate-y-px">
-                          <LogoOpenAI size={14}/>
-                      </div>
-                  </button>
-              </div>
-          )}
-
             <div className="flex flex-col gap-4 w-full">
                 {message.experimental_attachments && (
                     <div
@@ -140,8 +99,8 @@ const PurePreviewMessage = ({
                     const {type} = part;
                     const key = `message-${message.id}-part-${index}`;
 
-              if (type === 'reasoning') {
-                return (
+                    if (type === 'reasoning') {
+                        return (
                   <MessageReasoning
                     key={key}
                     isLoading={isLoading}
@@ -269,7 +228,6 @@ const PurePreviewMessage = ({
                 }
               }
             })}
-
             {!isReadonly && (
               <MessageActions
                 key={`action-${message.id}`}
@@ -277,9 +235,10 @@ const PurePreviewMessage = ({
                 message={message}
                 vote={vote}
                 isLoading={isLoading}
+                handleRegenerate={handleRegenerate}
               />
             )}
-          </div>
+            </div>
         </div>
       </motion.div>
     </AnimatePresence>

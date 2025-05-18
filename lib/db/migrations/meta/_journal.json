@@ -43,6 +43,41 @@
       "when": 1741934630596,
       "tag": "0005_wooden_whistler",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1744767949220,
+      "tag": "0006_deep_luke_cage",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1744768068278,
+      "tag": "0007_orange_king_bedlam",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1744768166741,
+      "tag": "0008_wide_stark_industries",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1744768223347,
+      "tag": "0009_light_captain_marvel",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1744768600499,
+      "tag": "0010_robust_the_stranger",
+      "breakpoints": true
     }
   ]
 }

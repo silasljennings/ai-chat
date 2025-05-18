@@ -30,40 +30,22 @@ export const maxDuration = 60;
 
 export async function POST(request: Request) {
   try {
-    const {
-      id,
-      messages,
-      selectedChatModel,
-    }: {
-      id: string;
-      messages: Array<UIMessage>;
-      selectedChatModel: string;
-    } = await request.json();
+    const {id, messages, selectedChatModel }: { id: string; messages: Array<UIMessage>; selectedChatModel: string; } = await request.json();
 
     const session = await auth();
-    console.log("HELLO")
-    if (!session || !session.user || !session.user.id) {
-      return new Response('Unauthorized', { status: 401 });
-    }
+    if (!session || !session.user || !session.user.id) { return new Response('Unauthorized', { status: 401 }); }
 
     const userMessage = getMostRecentUserMessage(messages);
 
-    if (!userMessage) {
-      return new Response('No user message found', { status: 400 });
-    }
+    if (!userMessage) { return new Response('No user message found', { status: 400 }); }
 
     const chat = await getChatById({ id });
 
     if (!chat) {
-      const title = await generateTitleFromUserMessage({
-        message: userMessage,
-      });
-
+      const title = await generateTitleFromUserMessage({ message: userMessage, });
       await saveChat({ id, userId: session.user.id, title });
     } else {
-      if (chat.userId !== session.user.id) {
-        return new Response('Unauthorized', { status: 401 });
-      }
+      if (chat.userId !== session.user.id) { return new Response('Unauthorized', { status: 401 }); }
     }
 
     await saveMessages({
@@ -75,6 +57,8 @@ export async function POST(request: Request) {
           parts: userMessage.parts,
           attachments: userMessage.experimental_attachments ?? [],
           createdAt: new Date(),
+          updatedAt: new Date(),
+          relativeMessageId: null
         },
       ],
     });
@@ -131,9 +115,10 @@ export async function POST(request: Request) {
                       chatId: id,
                       role: assistantMessage.role,
                       parts: assistantMessage.parts,
-                      attachments:
-                        assistantMessage.experimental_attachments ?? [],
+                      attachments: assistantMessage.experimental_attachments ?? [],
                       createdAt: new Date(),
+                      updatedAt: new Date(),
+                      relativeMessageId: userMessage.id,
                     },
                   ],
                 });

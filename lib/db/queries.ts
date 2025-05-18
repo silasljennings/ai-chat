@@ -18,6 +18,7 @@ import {
   Chat,
 } from './schema';
 import { ArtifactKind } from '@/components/artifact';
+import {reGenerateTextFromUserMessage} from "@/app/(chat)/actions";
 
 // Optionally, if not using email/pass login, you can
 // use the Drizzle adapter for Auth.js / NextAuth
@@ -165,7 +166,8 @@ export async function saveMessages({ messages }: { messages: Array<DBMessage>; }
     for (const messageRecord of messages) {
       if (messageRecord.id) {
         const existing = await getMessageById({ id: messageRecord.id });
-        if (existing) {
+        console.log(existing);
+        if (existing && existing.length > 0) {
           console.log(`message exists: ${existing}`);
           await db.update(message).set(messageRecord).where(eq(message.id, messageRecord.id));
         } else {
@@ -411,13 +413,7 @@ export async function deleteMessageById({ id }: { id: string }) {
   }
 }
 
-export async function updateChatVisiblityById({
-  chatId,
-  visibility,
-}: {
-  chatId: string;
-  visibility: 'private' | 'public';
-}) {
+export async function updateChatVisibilityById({ chatId, visibility }: { chatId: string;  visibility: 'private' | 'public'; }) {
   try {
     return await db.update(chat).set({ visibility }).where(eq(chat.id, chatId));
   } catch (error) {
@@ -425,3 +421,61 @@ export async function updateChatVisiblityById({
     throw error;
   }
 }
+
+export async function reloadAt({ chatId, assistantMessageId, model }: { chatId: string, assistantMessageId: string, model: string }): Promise<DBMessage> {
+  try {
+
+    // safely extract the data from the assistant message -> the previous response
+    const assistantMessageQueryResults: DBMessage[] = await getMessageById({id: assistantMessageId});
+    if (!assistantMessageQueryResults || assistantMessageQueryResults.length === 0) { throw Error('Assistant Message could not be found for re-prompting.'); }
+    const assistantMessage: DBMessage = assistantMessageQueryResults[0];
+    if (!assistantMessage) { throw new Error('Assistant Message is null or undefined'); }
+    if (!assistantMessage.relativeMessageId) { throw new Error('Assistant Message does not have a relative message to re-prompt'); }
+    if (!assistantMessage.parts) { throw new Error('Assistant Message does not have message parts to use for re-prompting'); }
+    const assistantMessageParts: [{ type: string, text: string }] = assistantMessage.parts as [{ type: string, text: string }];
+    const assistantMessagePartsFiltered = assistantMessageParts.filter(part => part.type && part.text) as [{ type: string, text: string }];
+    if (assistantMessagePartsFiltered[0].type !== "text") { throw Error('Messages must be of type text'); }
+    const response = assistantMessagePartsFiltered[0].text;
+
+    // safely extract the data from the user message - the prompt that generated the previous response
+    const userMessageQueryResults: DBMessage[] = await getMessageById({ id: assistantMessage.relativeMessageId });
+    if (!userMessageQueryResults || userMessageQueryResults.length === 0) { throw Error('User Message could not be found for re-prompting.'); }
+    const userMessage: DBMessage = userMessageQueryResults[0];
+    if (!userMessage) { throw new Error('User Message is null or undefined'); }
+    if (!userMessage.parts) { throw new Error('User Message does not have message parts to use for re-prompting'); }
+    const userMessageParts: [{ type: string, text: string }] = userMessage.parts as [{ type: string, text: string }];
+    if (!userMessageParts) { throw Error('Prompt is undefined') }
+    if (userMessageParts[0].type !== "text") { throw Error('Prompt must be of type text'); }
+    const prompt = userMessageParts[0].text;
+
+    // regenerate a new response
+    const newResponse = await reGenerateTextFromUserMessage({ prompt: prompt, response: response, model: model });
+
+    // reset the parts value of the assistant message to the new response value
+    const partIndex = assistantMessageParts.findIndex(part => part.type === 'text' && part.text === response);
+    if (partIndex !== -1) {
+      assistantMessageParts[partIndex].text = newResponse;
+    } else { throw new Error('Original message part not found for replacement'); }
+
+    // update the regenerated message to the database
+    const newAssistantMessage: DBMessage = {
+      id: assistantMessageQueryResults[0].id,
+      chatId: chatId,
+      role: assistantMessageQueryResults[0].role,
+      createdAt: assistantMessageQueryResults[0].createdAt,
+      updatedAt: new Date(),
+      parts: assistantMessageParts,
+      attachments:  assistantMessageQueryResults[0].attachments ?? [],
+      relativeMessageId: assistantMessageQueryResults[0].relativeMessageId,
+    };
+    await saveMessages({ messages: [newAssistantMessage] });
+
+    // return the assistant message for ui
+    return newAssistantMessage;
+  } catch (error) {
+    console.error('Failed to update chat visibility in database');
+    throw error;
+  }
+}
+
+
